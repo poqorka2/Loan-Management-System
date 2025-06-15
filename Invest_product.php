@@ -8,49 +8,32 @@ $db = new db_class();
 <html lang="en">
 
 <head>
-
+    <style>
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+        }
+    </style>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-    <title>Loan Management System</title>
-
+    <title>Invest Products</title>
     <link href="fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
-
-
     <link href="css/sb-admin-2.css" rel="stylesheet">
-
-    <!-- Custom styles for this page -->
     <link href="css/dataTables.bootstrap4.css" rel="stylesheet">
-
 </head>
 
 <body id="page-top">
-
-    <!-- Page Wrapper -->
     <div id="wrapper">
-
         <?php include("inc/sidebar.php"); ?>
 
-        <!-- Content Wrapper -->
         <div id="content-wrapper" class="d-flex flex-column">
-
-            <!-- Main Content -->
             <div id="content">
-
-                <!-- Topbar -->
                 <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
-
-                    <!-- Sidebar Toggle (Topbar) -->
                     <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
                         <i class="fa fa-bars"></i>
                     </button>
-
-
-                    <!-- Topbar Navbar -->
                     <ul class="navbar-nav ml-auto">
-
-                        <!-- Nav Item - User Information -->
                         <li class="nav-item dropdown no-arrow">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -58,7 +41,6 @@ $db = new db_class();
                                 <img class="img-profile rounded-circle"
                                     src="image/admin_profile.svg">
                             </a>
-                            <!-- Dropdown - User Information -->
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                                 aria-labelledby="userDropdown">
                                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
@@ -67,114 +49,120 @@ $db = new db_class();
                                 </a>
                             </div>
                         </li>
-
                     </ul>
-
                 </nav>
-                <!-- End of Topbar -->
-
-                <!-- Begin Page Content -->
                 <div class="container-fluid">
-
-                    <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                        <h1 class="h3 mb-0 text-gray-800">Users</h1>
+                        <h1 class="h3 mb-0 text-gray-800">Invest Products</h1>
                     </div>
-                    <button class="mb-2 btn btn-lg btn-success" href="#" data-toggle="modal" data-target="#addModal"><span class="fa fa-plus"></span> Add User</button>
-                    <!-- DataTales Example -->
+                    <button class="mb-2 btn btn-lg btn-success" href="#" data-toggle="modal" data-target="#addModal"><span class="fa fa-plus"></span> Add Invest Product</button>
                     <div class="card shadow mb-4">
                         <div class="card-body">
                             <div class="table-responsive">
                                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                     <thead>
                                         <tr>
-                                            <th>Username</th>
-                                            <th>Password</th>
-                                            <th>Name</th>
+                                            <th>Borrower</th>
+                                            <th>Product Name</th>
+                                            <th>Price Estimate</th>
+                                            <th>Job</th>
+                                            <th>Income</th>
+                                            <th>Documentation</th>
+                                            <th>Date Created</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <?php
-                                        $tbl_user = $db->display_user();
-
-                                        while ($fetch = $tbl_user->fetch_array()) {
+                                        $tbl_products = $db->display_invest_product();
+                                        while ($fetch = $tbl_products->fetch_array()) {
+                                            // Get borrower name
+                                            $borrower = $db->get_borrower($fetch['borrower_id']);
                                         ?>
-
                                             <tr>
-                                                <td><?php echo $fetch['username'] ?></td>
-                                                <td><?php echo $db->hide_pass($fetch['password']) ?></td>
-                                                <td><?php echo $fetch['firstname'] . " " . $fetch['lastname'] ?></td>
+                                                <td><?php echo $borrower['firstname'] . ' ' . $borrower['lastname']; ?></td>
+                                                <td><?php echo $fetch['product_name']; ?></td>
+                                                <td><?php echo number_format($fetch['price_estimate'], 2); ?></td>
+                                                <td><?php echo $fetch['job']; ?></td>
+                                                <td><?php echo number_format($fetch['income'], 2); ?></td>
+                                                <td>
+                                                    <?php if ($fetch['documentation']) { ?>
+                                                        <a href="uploads/<?php echo htmlspecialchars($fetch['documentation']); ?>" target="_blank">View</a>
+                                                    <?php } else {
+                                                        echo 'No file';
+                                                    } ?>
+                                                </td>
+                                                <td><?php echo $fetch['date_created']; ?></td>
                                                 <td>
                                                     <div class="dropdown">
                                                         <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                             Action
                                                         </button>
                                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                            <a class="dropdown-item bg-warning text-white" href="#" data-toggle="modal" data-target="#updateModal<?php echo $fetch['user_id'] ?>"><i class="fa fa-edit fa-1x"></i> Edit</a>
-                                                            <?php
-                                                            if ($fetch['user_id'] == $_SESSION['user_id']) {
-                                                            ?>
-                                                                <a class="dropdown-item bg-danger text-white" href="#" disabled="disabled"><i class="fa fa-exclamation fa-1x"></i> Cannot Delete</a>
-                                                            <?php
-                                                            } else {
-                                                            ?>
-                                                                <a class="dropdown-item bg-danger text-white" href="#" data-toggle="modal" data-target="#deleteModal<?php echo $fetch['user_id'] ?>"><i class="fa fa-trash fa-1x"></i> Delete</a>
-                                                            <?php
-                                                            }
-                                                            ?>
+                                                            <a class="dropdown-item bg-warning text-white" href="#" data-toggle="modal" data-target="#updateProduct<?php echo $fetch['product_id'] ?>">Edit</a>
+                                                            <a class="dropdown-item bg-danger text-white" href="#" data-toggle="modal" data-target="#deleteProduct<?php echo $fetch['product_id'] ?>">Delete</a>
                                                         </div>
                                                     </div>
-
-
                                                 </td>
                                             </tr>
 
-
-                                            <!-- Update User Modal -->
-                                            <div class="modal fade" id="updateModal<?php echo $fetch['user_id'] ?>" tabindex="-1" aria-hidden="true">
+                                            <!-- Update Modal -->
+                                            <div class="modal fade" id="updateProduct<?php echo $fetch['product_id'] ?>" tabindex="-1" aria-hidden="true">
                                                 <div class="modal-dialog">
-                                                    <form method="POST" action="updateUser.php">
+                                                    <form method="POST" action="update_invest_product.php" enctype="multipart/form-data">
                                                         <div class="modal-content">
                                                             <div class="modal-header bg-warning">
-                                                                <h5 class="modal-title text-white">Edit User</h5>
+                                                                <h5 class="modal-title text-white">Edit Invest Product</h5>
                                                                 <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                                                                     <span aria-hidden="true">×</span>
                                                                 </button>
                                                             </div>
                                                             <div class="modal-body">
+                                                                <input type="hidden" name="product_id" value="<?php echo $fetch['product_id'] ?>" />
                                                                 <div class="form-group">
-                                                                    <label>Username</label>
-                                                                    <input type="text" name="username" value="<?php echo $fetch['username'] ?>" class="form-control" required="required" />
-                                                                    <input type="hidden" name="user_id" value="<?php echo $fetch['user_id'] ?>" />
+                                                                    <label>Borrower</label>
+                                                                    <select name="borrower_id" class="form-control" required>
+                                                                        <?php
+                                                                        $borrowers = $db->display_borrower();
+                                                                        while ($b = $borrowers->fetch_array()) {
+                                                                            $selected = $b['borrower_id'] == $fetch['borrower_id'] ? 'selected' : '';
+                                                                            echo "<option value='{$b['borrower_id']}' $selected>{$b['firstname']} {$b['lastname']}</option>";
+                                                                        }
+                                                                        ?>
+                                                                    </select>
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <label>Password</label>
-                                                                    <input type="password" name="password" value="<?php echo $fetch['password'] ?>" class="form-control" required="required" />
+                                                                    <label>Product Name</label>
+                                                                    <input type="text" name="product_name" value="<?php echo $fetch['product_name'] ?>" class="form-control" required />
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <label>Firstanme</label>
-                                                                    <input type="text" name="firstname" value="<?php echo $fetch['firstname'] ?>" class="form-control" required="required" />
+                                                                    <label>Price Estimate</label>
+                                                                    <input type="number" name="price_estimate" value="<?php echo $fetch['price_estimate'] ?>" class="form-control" step="0.01" min="0" required />
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <label>Lastname</label>
-                                                                    <input type="text" name="lastname" value="<?php echo $fetch['lastname'] ?>" class="form-control" required="required" />
+                                                                    <label>Job</label>
+                                                                    <input type="text" name="job" value="<?php echo $fetch['job'] ?>" class="form-control" required />
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label>Income</label>
+                                                                    <input type="number" name="income" value="<?php echo $fetch['income'] ?>" class="form-control" step="0.01" min="0" required />
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label>Documentation (leave blank to keep current)</label>
+                                                                    <input type="file" name="documentation" class="form-control" />
                                                                 </div>
                                                             </div>
                                                             <div class="modal-footer">
                                                                 <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                                                                <button type="submit" name="update" class="btn btn-warning">Update</a>
+                                                                <button type="submit" name="update" class="btn btn-warning">Update</button>
                                                             </div>
                                                         </div>
                                                     </form>
                                                 </div>
                                             </div>
 
-
-
-                                            <!-- Delete User Modal -->
-
-                                            <div class="modal fade" id="deleteModal<?php echo $fetch['user_id'] ?>" tabindex="-1" aria-hidden="true">
+                                            <!-- Delete Modal -->
+                                            <div class="modal fade" id="deleteProduct<?php echo $fetch['product_id'] ?>" tabindex="-1" aria-hidden="true">
                                                 <div class="modal-dialog">
                                                     <div class="modal-content">
                                                         <div class="modal-header bg-danger">
@@ -186,27 +174,18 @@ $db = new db_class();
                                                         <div class="modal-body">Are you sure you want to delete this record?</div>
                                                         <div class="modal-footer">
                                                             <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                                                            <a class="btn btn-danger" href="deleteUser.php?user_id=<?php echo $fetch['user_id'] ?>&user=<?php echo $_SESSION['user'] ?>">Delete</a>
+                                                            <a class="btn btn-danger" href="delete_invest_Product.php?product_id=<?php echo $fetch['product_id'] ?>">Delete</a>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-
-
-
-
-                                        <?php
-                                        }
-                                        ?>
+                                        <?php } ?>
                                     </tbody>
                                 </table>
                             </div>
                         </div>
-
                     </div>
                 </div>
-                <!-- End of Main Content -->
-
                 <!-- Footer -->
                 <footer class="stocky-footer">
                     <div class="container my-auto">
@@ -215,58 +194,66 @@ $db = new db_class();
                         </div>
                     </div>
                 </footer>
-                <!-- End of Footer -->
-
             </div>
-            <!-- End of Content Wrapper -->
-
         </div>
-        <!-- End of Page Wrapper -->
-
         <!-- Scroll to Top Button-->
         <a class="scroll-to-top rounded" href="#page-top">
             <i class="fas fa-angle-up"></i>
         </a>
 
-
-        <!-- Add User Modal-->
+        <!-- Add Modal-->
         <div class="modal fade" id="addModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog">
-                <form method="POST" action="addUser.php">
+                <form method="POST" action="save_invest_product.php" enctype="multipart/form-data">
                     <div class="modal-content">
                         <div class="modal-header bg-primary">
-                            <h5 class="modal-title text-white">Add User</h5>
+                            <h5 class="modal-title text-white">Add Invest Product</h5>
                             <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">×</span>
                             </button>
                         </div>
                         <div class="modal-body">
                             <div class="form-group">
-                                <label>Username</label>
-                                <input type="text" name="username" class="form-control" required="required" />
+                                <label>Borrower</label>
+                                <select name="borrower_id" class="form-control" required>
+                                    <option value="">Select Borrower</option>
+                                    <?php
+                                    $borrowers = $db->display_borrower();
+                                    while ($b = $borrowers->fetch_array()) {
+                                        echo "<option value='{$b['borrower_id']}'>{$b['firstname']} {$b['lastname']}</option>";
+                                    }
+                                    ?>
+                                </select>
                             </div>
                             <div class="form-group">
-                                <label>Password</label>
-                                <input type="password" name="password" class="form-control" required="required" />
+                                <label>Product Name</label>
+                                <input type="text" name="product_name" class="form-control" required />
                             </div>
                             <div class="form-group">
-                                <label>Firstname</label>
-                                <input type="text" name="firstname" class="form-control" required="required" />
+                                <label>Price Estimate</label>
+                                <input type="number" name="price_estimate" class="form-control" step="0.01" min="0" required />
                             </div>
                             <div class="form-group">
-                                <label>Lastname</label>
-                                <input type="text" name="lastname" class="form-control" required="required" />
+                                <label>Job</label>
+                                <input type="text" name="job" class="form-control" required />
+                            </div>
+                            <div class="form-group">
+                                <label>Income</label>
+                                <input type="number" name="income" class="form-control" step="0.01" min="0" required />
+                            </div>
+                            <div class="form-group">
+                                <label>Documentation</label>
+                                <input type="file" name="documentation" class="form-control" required />
                             </div>
                         </div>
                         <div class="modal-footer">
                             <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                            <button type="submit" name="confirm" class="btn btn-primary">Confirm</a>
+                            <button type="submit" name="save" class="btn btn-primary">Save</button>
                         </div>
                     </div>
                 </form>
             </div>
         </div>
-
 
         <!-- Logout Modal-->
         <div class="modal fade" id="logoutModal" tabindex="-1" aria-hidden="true">
@@ -290,29 +277,19 @@ $db = new db_class();
         <!-- Bootstrap core JavaScript-->
         <script src="js/jquery.js"></script>
         <script src="js/bootstrap.bundle.js"></script>
-
-        <!-- Core plugin JavaScript-->
         <script src="js/jquery.easing.js"></script>
-
-
-        <!-- Page level plugins -->
         <script src="js/jquery.dataTables.js"></script>
         <script src="js/dataTables.bootstrap4.js"></script>
-
-
-        <!-- Custom scripts for all pages-->
         <script src="js/sb-admin-2.js"></script>
-
         <script>
             $(document).ready(function() {
                 $('#dataTable').DataTable({
                     "order": [
-                        [3, "asc"]
+                        [1, "asc"]
                     ]
                 });
             });
         </script>
-
 </body>
 
 </html>
