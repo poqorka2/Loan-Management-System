@@ -44,6 +44,12 @@
                     <span>Invest Products</span></a>
             </li>
             <li class="nav-item">
+                <a class="nav-link" href="guarantor.php">
+                    <i class="fas fa-user-shield"></i>
+                    <span>Guarantors</span>
+                </a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link" href="user.php">
                     <i class="fas fa-fw fa-user"></i>
                     <span>Users</span></a>

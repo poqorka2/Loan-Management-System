@@ -11,8 +11,6 @@
     <title>Loan Management System</title>
 
     <link href="css/all.css" rel="stylesheet" type="text/css">
-  
-   
     <link href="css/sb-admin-2.css" rel="stylesheet">
 
 </head>
@@ -21,6 +19,7 @@
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 		<a class="navbar-brand" href="">Loan Management System</a>
 	</nav>
+
     <div class="container">
 		<div class="row justify-content-center">
 			<div class="col-xl-10 col-lg-12 col-md-9">
@@ -33,12 +32,15 @@
                                     <div class="text-center">
                                         <h1 class="h4 text-gray-900 mb-4">USER LOGIN</h1>
                                     </div>
+
+                                    <!-- Admin Login -->
                                     <form method="POST" class="user" action="login.php">
+                                        <h5>Admin Login</h5>
                                         <div class="form-group">
-                                            <input type="text" class="form-control form-control-user" name="username" placeholder="Enter Username here..." required="required">
+                                            <input type="text" class="form-control form-control-user" name="username" placeholder="Enter Admin Username" required="required">
                                         </div>
                                         <div class="form-group">
-                                            <input type="password" class="form-control form-control-user" name="password" placeholder="Enter Password here..." required="required">
+                                            <input type="password" class="form-control form-control-user" name="password" placeholder="Enter Admin Password" required="required">
                                         </div>
 										<?php 
 											session_start();
@@ -46,8 +48,28 @@
 												echo "<center><label class='text-danger'>".$_SESSION['message']."</label></center>";
 											}
 										?>
-                                        <button type="submit" class="btn btn-primary btn-user btn-block" name="login">Login</button>
+                                        <button type="submit" class="btn btn-primary btn-user btn-block" name="login">Admin Login</button>
                                     </form>
+
+                                    <hr>
+
+                                    <!-- Customer Login -->
+                                    <form method="POST" class="user" action="customer_login.php">
+                                        <h5>Customer Login</h5>
+                                        <div class="form-group">
+                                            <input type="email" class="form-control form-control-user" name="email" placeholder="Enter Customer Email" required="required">
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="password" class="form-control form-control-user" name="password" placeholder="Enter Customer Password" required="required">
+                                        </div>
+										<?php 
+											if(ISSET($_SESSION['customer_message'])){
+												echo "<center><label class='text-danger'>".$_SESSION['customer_message']."</label></center>";
+											}
+										?>
+                                        <button type="submit" class="btn btn-success btn-user btn-block" name="customer_login">Customer Login</button>
+                                    </form>
+
                                 </div>
                             </div>
                         </div>
@@ -56,10 +78,12 @@
             </div>
         </div>
     </div>
+
 	<nav class="navbar fixed-bottom navbar-dark bg-dark">
 		<label style="color:#ffffff;">&copy; Copyright Loan Management System</label>
 		<label style="color:#ffffff;">All Rights Reserved <?php echo date("Y")?> </label>
 	</nav>
+
 </body>
 
 </html>
