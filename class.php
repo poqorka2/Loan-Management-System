@@ -404,4 +404,115 @@ class db_class extends db_connect
 		$result = $stmt->get_result();
 		return $result->fetch_assoc();
 	}
+
+
+	/* Customer function */
+	public function add_customer($name, $email, $password, $phone, $address)
+	{
+		$query = $this->conn->prepare("INSERT INTO `customer` (`name`, `email`, `password`, `phone`, `address`) VALUES (?, ?, ?, ?, ?)") or die($this->conn->error);
+		$query->bind_param("sssss", $name, $email, $password, $phone, $address);
+
+		if ($query->execute()) {
+			$query->close();
+			$this->conn->close();
+			return true;
+		}
+	}
+
+	/* Customer_login function */
+	public function customer_login($email, $password)
+	{
+		$query = $this->conn->prepare("SELECT * FROM `customer` WHERE `email` = ?") or die($this->conn->error);
+		$query->bind_param("s", $email);
+		$query->execute();
+		$result = $query->get_result();
+
+		if ($result->num_rows == 1) {
+			$fetch = $result->fetch_assoc();
+
+			if (password_verify($password, $fetch['password'])) {
+				return array(
+					'id' => $fetch['id'],
+					'name' => $fetch['name'],
+					'email' => $fetch['email']
+				);
+			} else {
+				return false; // password invalid
+			}
+		} else {
+			return false; // user not found
+		}
+	}
+
+	/* Customer_loan_request function */
+	public function add_customer_loan_request($customer_id, $loan_type_id, $loan_plan_id, $amount, $reason, $date_needed)
+	{
+		$stmt = $this->conn->prepare("INSERT INTO loan_requests (customer_id, loan_type_id, loan_plan_id, amount, reason, date_needed, status, created_at) VALUES (?, ?, ?, ?, ?, ?, 'Pending', NOW())");
+		$stmt->bind_param("iiisss", $customer_id, $loan_type_id, $loan_plan_id, $amount, $reason, $date_needed);
+		$stmt->execute();
+		$stmt->close();
+	}
+
+
+	public function update_loan_request_status($loan_request_id, $new_status)
+	{
+		$stmt = $this->conn->prepare("UPDATE loan_requests SET status = ? WHERE id = ?");
+		$stmt->bind_param("si", $new_status, $loan_request_id);
+		$stmt->execute();
+		$stmt->close();
+	}
+
+	public function loan_type_exists($loan_type_id)
+	{
+		$stmt = $this->conn->prepare("SELECT COUNT(*) FROM loan_type WHERE ltype_id = ?");
+		$stmt->bind_param("i", $loan_type_id);
+		$stmt->execute();
+		$count = 0;
+		$stmt->bind_result($count);
+		$stmt->fetch();
+		$stmt->close();
+		return $count > 0;
+	}
+
+	public function loan_plan_exists($loan_plan_id)
+	{
+		$stmt = $this->conn->prepare("SELECT COUNT(*) FROM loan_plan WHERE lplan_id = ?");
+		$stmt->bind_param("i", $loan_plan_id);
+		$stmt->execute();
+		$count = 0;
+		$stmt->bind_result($count);
+		$stmt->fetch();
+		$stmt->close();
+		return $count > 0;
+	}
+
+	public function add_loan_request($customer_id, $loan_type_id, $loan_plan_id, $amount, $reason, $date_needed)
+	{
+		$stmt = $this->conn->prepare("INSERT INTO loan_requests (customer_id, loan_type_id, loan_plan, amount, reason, date_needed, status, date_requested) VALUES (?, ?, ?, ?, ?, ?, 'Pending', NOW())");
+		$stmt->bind_param("iiidss", $customer_id, $loan_type_id, $loan_plan_id, $amount, $reason, $date_needed);
+		$result = $stmt->execute();
+		$stmt->close();
+		return $result;
+	}
+
+	/* Guarantor  Function */
+
+
+	public function add_guarantor($name, $email, $phone, $relationship, $loan_id)
+	{
+		$query = $this->conn->prepare("INSERT INTO guarantors (name, email, phone, relationship, loan_id) VALUES (?, ?, ?, ?, ?)") or die($this->conn->error);
+		$query->bind_param("ssssi", $name, $email, $phone, $relationship, $loan_id);
+
+		if ($query->execute()) {
+			$query->close();
+			$this->conn->close();
+			return true;
+		}
+	}
+	// Fetch all guarantors from the database
+	public function display_guarantors()
+	{
+		$query = $this->conn->query("SELECT * FROM guarantor") or die($this->conn->error);
+		return $query;
+	}
 }
